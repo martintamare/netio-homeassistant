@@ -1,6 +1,6 @@
 {
   "domain": "netio",
-  "name": "Netio",
+  "name": "Netio (JSON version)",
   "version": "0.1.0",
   "documentation": "https://github.com/martintamare/netio-homeassistant",
   "requirements": [

@@ -17,6 +17,21 @@ DATA_SCHEMA = vol.Schema({
     vol.Required(CONF_PASSWORD): str,
 })
 
+class NetioBinder():
+    def __init__(self, ip, port, username, password):
+        self.ip = ip
+        self.port = port
+        self.username = username,
+        self.password = password
+
+    @property
+    def client(self):
+        url = f"http://{self.ip}:{self.port}/netio.json"
+        return Netio(url, auth_rw=(username, password))
+
+    def get_outputs(self):
+        return self.client.get_outputs()
+
 
 class NetioConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Netio."""
@@ -32,8 +47,7 @@ class NetioConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             password = user_input[CONF_PASSWORD]
             try:
                 # Create the Netio client (assumed to be a blocking call)
-                url = f"http://{ip}:{port}/netio.json"
-                client = Netio(url, auth_rw=(username, password))
+                client = NetioBinder(ip, port, username, password)
                 # Try to fetch output info in a thread so as not to block the event loop.
                 outputs = await self.hass.async_add_executor_job(client.get_outputs)
                 if not outputs:

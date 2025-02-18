@@ -1,0 +1,6 @@
+reset:
+  name: Reset an output
+  description: Reset an output but switching to off, wait a bit, then on
+  target:
+    entity:
+      domain: switch

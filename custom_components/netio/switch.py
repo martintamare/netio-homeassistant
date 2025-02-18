@@ -14,6 +14,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         switches.append(NetioSwitch(client, output, config_entry))
     async_add_entities(switches, update_before_add=True)
 
+    platform = async_get_current_platform()
+    platform.async_register_entity_service(
+        "reset",
+        {},  # No additional parameters needed.
+        "async_reset",
+    )
+
+
 
 class NetioSwitch(SwitchEntity):
     """Representation of a Netio output as a switch."""
@@ -65,6 +73,13 @@ class NetioSwitch(SwitchEntity):
         await self.hass.async_add_executor_job(turn_off)
         self._state = False
         self.async_write_ha_state()
+
+    async def async_reset(self, **kwargs):
+        """Reset the output by setting its output to 2."""
+        def reset():
+            # Set the output state to 2 to trigger a reset.
+            self._client.set_output(self._output.ID, 2)
+        await self.hass.async_add_executor_job(reset)
 
     async def async_update(self):
         """Retrieve the latest state from the Netio device."""

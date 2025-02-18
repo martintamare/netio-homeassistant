@@ -6,29 +6,29 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the Netio switches from a config entry."""
     data = hass.data[DOMAIN][config_entry.entry_id]
     client = data["client"]
-    outlets = data["outlets"]
+    outputs = data["outputs"]
 
     switches = []
-    for outlet in outlets:
-        # Here we assume each outlet is a dict with at least an "id" and "name" key.
-        switches.append(NetioSwitch(client, outlet, config_entry))
+    for output in outputs:
+        # Here we assume each output is a dict with at least an "id" and "name" key.
+        switches.append(NetioSwitch(client, output, config_entry))
     async_add_entities(switches, update_before_add=True)
 
 
 class NetioSwitch(SwitchEntity):
-    """Representation of a Netio outlet as a switch."""
+    """Representation of a Netio output as a switch."""
 
-    def __init__(self, client, outlet, config_entry):
+    def __init__(self, client, output, config_entry):
         """Initialize a Netio switch."""
         self._client = client
-        self._outlet = outlet  # e.g. {'id': 1, 'name': 'Outlet 1'}
+        self._output = output  # e.g. {'id': 1, 'name': 'Outlet 1'}
         self._config_entry = config_entry
         self._state = None
 
     @property
     def name(self):
         """Return the name of the switch."""
-        return self._outlet.get("name", f"Outlet {self._outlet.get('id')}")
+        return self._output.Name
 
     @property
     def is_on(self):
@@ -38,7 +38,7 @@ class NetioSwitch(SwitchEntity):
     @property
     def unique_id(self):
         """Return a unique ID for this switch."""
-        return f"{self._config_entry.entry_id}_{self._outlet.get('id')}"
+        return f"{self._config_entry.entry_id}_{self._output.ID}"
 
     @property
     def device_info(self):
@@ -51,19 +51,17 @@ class NetioSwitch(SwitchEntity):
         }
 
     async def async_turn_on(self, **kwargs):
-        """Turn the outlet on."""
+        """Turn the output on."""
         def turn_on():
-            # Adjust this call based on the PyNetio API
-            self._client.set_outlet(self._outlet.get("id"), True)
+            self._client.set_output(self._output.ID, 1)
         await self.hass.async_add_executor_job(turn_on)
         self._state = True
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
-        """Turn the outlet off."""
+        """Turn the output off."""
         def turn_off():
-            # Adjust this call based on the PyNetio API
-            self._client.set_outlet(self._outlet.get("id"), False)
+            self._client.set_output(self._output.ID, 0)
         await self.hass.async_add_executor_job(turn_off)
         self._state = False
         self.async_write_ha_state()
@@ -71,7 +69,7 @@ class NetioSwitch(SwitchEntity):
     async def async_update(self):
         """Retrieve the latest state from the Netio device."""
         def get_state():
-            # Adjust this call if the PyNetio library provides a way to get the current state
-            return self._client.get_outlet_state(self._outlet.get("id"))
+            output = self._client.get_output(self._output.ID)
+            return output.State
         self._state = await self.hass.async_add_executor_job(get_state)
 

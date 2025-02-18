@@ -5,8 +5,7 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_PORT, CONF_USERNAME, CONF_PASSWORD
 from .const import DOMAIN, CONF_IP_ADDRESS
 
-# Import the PyNetio library (adjust the import as needed based on the library’s API)
-from PyNetio import PyNetio
+from Netio import Netio
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,12 +31,13 @@ class NetioConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             username = user_input[CONF_USERNAME]
             password = user_input[CONF_PASSWORD]
             try:
-                # Create the PyNetio client (assumed to be a blocking call)
-                client = PyNetio(ip, port, username, password)
-                # Try to fetch outlet info in a thread so as not to block the event loop.
-                outlets = await self.hass.async_add_executor_job(client.get_outlets)
-                if not outlets:
-                    errors["base"] = "no_outlets_found"
+                # Create the Netio client (assumed to be a blocking call)
+                url = f"http://{ip}:{port}/netio.json"
+                client = Netio(url, auth_rw=(username, password))
+                # Try to fetch output info in a thread so as not to block the event loop.
+                outputs = await self.hass.async_add_executor_job(client.get_outputs)
+                if not outputs:
+                    errors["base"] = "no_outputs_found"
                 else:
                     # If connection and discovery succeed, create the config entry.
                     return self.async_create_entry(title=ip, data=user_input)

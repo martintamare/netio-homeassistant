@@ -3,7 +3,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from .const import DOMAIN, CONF_IP_ADDRESS, CONF_PORT, CONF_USERNAME, CONF_PASSWORD
 
-from PyNetio import PyNetio
+from Netio import Netio
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,20 +17,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     password = entry.data.get(CONF_PASSWORD)
 
     def create_client():
-        client = PyNetio(ip, port, username, password)
-        # Fetch the list of outlets (this should be a blocking call)
-        outlets = client.get_outlets()
-        return client, outlets
+        url = f"http://{ip}:{port}/netio.json"
+        client = Netio(url, auth_rw=(username, password))
+        # Fetch the list of outputs (this should be a blocking call)
+        outputs = client.get_outputs()
+        return client, outputs
 
     try:
-        client, outlets = await hass.async_add_executor_job(create_client)
+        client, outputs = await hass.async_add_executor_job(create_client)
     except Exception as e:
         _LOGGER.error("Failed to connect to Netio at %s:%s: %s", ip, port, e)
         return False
 
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
-        "outlets": outlets,
+        "outputs": outputs,
     }
 
     # Forward the setup to the switch platform

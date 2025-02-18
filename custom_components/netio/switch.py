@@ -81,6 +81,8 @@ class NetioSwitch(SwitchEntity):
             # Set the output state to 2 to trigger a reset.
             self._client.set_output(self._output.ID, 2)
         await self.hass.async_add_executor_job(reset)
+        self._state = True
+        self.async_write_ha_state()
 
     async def async_update(self):
         """Retrieve the latest state from the Netio device."""
@@ -88,4 +90,3 @@ class NetioSwitch(SwitchEntity):
             output = self._client.get_output(self._output.ID)
             return output.State
         self._state = await self.hass.async_add_executor_job(get_state)
-

@@ -27,7 +27,7 @@ class NetioBinder():
     @property
     def client(self):
         url = f"http://{self.ip}:{self.port}/netio.json"
-        return Netio(url, auth_rw=(username, password))
+        return Netio(url, auth_rw=(self.username, self.password))
 
     def get_outputs(self):
         return self.client.get_outputs()

@@ -1,0 +1,12 @@
+{
+  "domain": "netio",
+  "name": "Netio",
+  "version": "0.1.0",
+  "documentation": "https://github.com/martintamare/netio-homeassistant",
+  "requirements": [
+    "Netio==1.0.13"  // Replace with the actual version you need.
+  ],
+  "dependencies": [],
+  "codeowners": ["@martintamare"],
+  "config_flow": true
+}

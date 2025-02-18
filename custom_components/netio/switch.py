@@ -18,6 +18,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         switches.append(NetioSwitch(client, output, config_entry))
     async_add_entities(switches, update_before_add=True)
 
+    return True
+
 
 class NetioSwitch(SwitchEntity):
     """Representation of a Netio output as a switch."""

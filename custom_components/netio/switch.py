@@ -18,37 +18,24 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         switches.append(NetioSwitch(client, output, config_entry))
     async_add_entities(switches, update_before_add=True)
 
+    platform = async_get_current_platform()
+    platform.async_register_entity_service(
+        "reset",
+        {},  # No additional parameters needed.
+        "async_reset",
+    )
+
     return True
 
 
 class NetioSwitch(SwitchEntity):
     """Representation of a Netio output as a switch."""
-
-    _services_registered = False  # Class attribute to ensure one-time registration
-
-
     def __init__(self, client, output, config_entry):
         """Initialize a Netio switch."""
         self._client = client
         self._output = output  # e.g. {'id': 1, 'name': 'Outlet 1'}
         self._config_entry = config_entry
         self._state = None
-
-    async def async_added_to_hass(self):
-        """Register entity services when the entity is added to hass."""
-        # Only register the custom services once per platform
-        if not NetioSwitch._services_registered:
-            platform = async_get_current_platform()
-            if platform is not None:
-                platform.async_register_entity_service(
-                    "reset",
-                    {},  # No additional parameters
-                    "async_reset",
-                )
-                NetioSwitch._services_registered = True
-            else:
-                _LOGGER.error("Failed to get current platform for service registration.")
-
 
     @property
     def name(self):

@@ -1,3 +1,5 @@
+import logging
+
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.entity_platform import async_get_current_platform
 from .const import DOMAIN
